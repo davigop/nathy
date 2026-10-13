@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ff6b9a">
+  <title>Uma perguntinha, Nathiely 💗</title>
+  <style>
+    :root { --pink: #ff4f87; --deep: #e82e70; --cream: #fff8fb; --text: #53253a; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; overflow: hidden; display: grid; place-items: center;
+      padding: 20px; font-family: ui-rounded, "Segoe UI", system-ui, sans-serif; color: var(--text);
+      background: radial-gradient(circle at top left, #ffe1ec, transparent 45%),
+                  linear-gradient(135deg, #fff7fb, #ffd5e4);
+    }
+    .hearts { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+    .heart { position: absolute; bottom: -40px; opacity: .55; animation: floatUp linear infinite; }
+    @keyframes floatUp { to { transform: translateY(-115vh) rotate(25deg); opacity: 0; } }
+    .card {
+      position: relative; z-index: 1; width: min(100%, 470px); padding: 34px 24px 30px;
+      text-align: center; border: 1px solid #ffffffc9; border-radius: 30px;
+      background: #ffffffd9; box-shadow: 0 22px 70px #c34b7830; backdrop-filter: blur(10px);
+    }
+    .emoji { font-size: 58px; line-height: 1.2; margin-bottom: 12px; }
+    h1 { margin: 0 0 12px; font-size: clamp(1.7rem, 7vw, 2.25rem); line-height: 1.15; }
+    p { margin: 0 auto 24px; max-width: 330px; line-height: 1.6; color: #81536a; font-size: 1.02rem; }
+    .buttons { min-height: 64px; display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    button {
+      border: 0; border-radius: 999px; padding: 14px 25px; min-width: 115px; font-size: 1rem;
+      font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px #a62d5c20;
+      transition: transform .18s, box-shadow .18s;
+    }
+    button:active { transform: scale(.96); }
+    #yes { background: var(--pink); color: white; }
+    #yes:hover { background: var(--deep); box-shadow: 0 10px 24px #e82e7040; }
+    #no { background: #fff; color: #7b5365; border: 1px solid #f2d5e1; }
+    .hint { margin-top: 22px; font-size: .78rem; color: #b17b93; }
+    .hidden { display: none !important; }
+    .final h1 { color: var(--deep); }
+    .final p { color: #75445a; }
+    .final .emoji { animation: pulse 1s ease-in-out infinite alternate; }
+    @keyframes pulse { to { transform: scale(1.12); } }
+    .restart { margin-top: 8px; background: #ffe5ef; color: var(--deep); }
+    @media (max-width: 380px) { .card { padding: 28px 17px; } button { min-width: 105px; padding: 13px 20px; } }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
+  <main class="card" id="question">
+    <div class="emoji">🥹💗</div>
+    <h1>Nathiely, tenho uma pergunta...</h1>
+    <p>Eu queria te perguntar uma coisinha muito importante. Promete que vai responder com o coração? 💌</p>
+    <h2 style="font-size:1.25rem; margin: 0 0 20px;">Quer namorar comigo? 🫶</h2>
+    <div class="buttons" id="buttons">
+      <button id="yes" type="button">SIM! 💖</button>
+      <button id="no" type="button">Não 🙈</button>
+    </div>
+    <div class="hint">Escolha com carinho… 👀</div>
+  </main>
+
+  <main class="card final hidden" id="success" aria-live="polite">
+    <div class="emoji">🥹💘</div>
+    <h1>AAAAA, EU SABIA! 💗</h1>
+    <p>Nathiely, você acabou de deixar meu dia muito mais feliz. Quero viver momentos lindos ao seu lado, te fazer sorrir e criar várias memórias com você. 💐</p>
+    <h2 style="margin: 0 0 18px;">Então é oficial? 🥰❤️</h2>
+    <button class="restart" id="again" type="button">Ver de novo 💌</button>
+  </main>
+
+  <script>
+    const yes = document.getElementById('yes');
+    const no = document.getElementById('no');
+    const question = document.getElementById('question');
+    const success = document.getElementById('success');
+    let attempts = 0;
+    let settled = false;
+
+    function accept() {
+      if (settled) return;
+      settled = true;
+      question.classList.add('hidden');
+      success.classList.remove('hidden');
+      burstHearts();
+    }
+
+    function dodgeYes() {
+      if (settled) return;
+      attempts++;
+      if (attempts >= 5) {
+        yes.style.position = '';
+        yes.style.left = '';
+        yes.style.top = '';
+        yes.style.zIndex = '';
+        yes.textContent = 'SIM! 💖';
+        yes.removeEventListener('pointerenter', dodgeYes);
+        yes.removeEventListener('touchstart', touchDodge);
+        yes.onclick = accept;
+        no.textContent = 'Não 🙈';
+        return;
+      }
+      const maxX = Math.max(15, window.innerWidth - yes.offsetWidth - 30);
+      const maxY = Math.max(15, window.innerHeight - yes.offsetHeight - 30);
+      yes.style.position = 'fixed';
+      yes.style.zIndex = '5';
+      yes.style.left = (15 + Math.random() * (maxX - 15)) + 'px';
+      yes.style.top = (15 + Math.random() * (maxY - 15)) + 'px';
+      yes.textContent = ['EI, VOLTA AQUI! 😂', 'TENTA DE NOVO 💨', 'QUASE! 🤭', 'NÃO DESISTE 💗'][Math.min(attempts - 1, 3)];
+      no.textContent = ['Tem certeza? 🥺', 'Pensa mais um pouquinho 😭', 'Olha o SIM ali! 👀', 'Dá uma chance! 💞'][Math.min(attempts - 1, 3)];
+    }
+
+    function touchDodge(event) {
+      if (attempts < 5) {
+        event.preventDefault();
+        dodgeYes();
+      }
+    }
+
+    yes.addEventListener('pointerenter', dodgeYes);
+    yes.addEventListener('touchstart', touchDodge, { passive: false });
+    yes.addEventListener('click', (event) => {
+      if (!settled && attempts < 5) {
+        event.preventDefault();
+        dodgeYes();
+      } else {
+        accept();
+      }
+    });
+
+    no.addEventListener('click', () => {
+      if (attempts < 5) {
+        no.textContent = ['Tem certeza? 🥺', 'Pensa com carinho 😭', 'O SIM tá fugindo de você 😂', 'Última chance? 💗'][Math.min(attempts, 3)];
+        dodgeYes();
+      }
+    });
+
+    document.getElementById('again').addEventListener('click', () => window.location.reload());
+
+    function burstHearts() {
+      for (let i = 0; i < 24; i++) {
+        const h = document.createElement('span');
+        h.textContent = ['💗','💖','💕','❤️','💘'][i % 5];
+        h.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:${Math.random()*100}vh;font-size:${18+Math.random()*24}px;z-index:10;pointer-events:none;animation:floatUp ${2+Math.random()*3}s linear forwards`;
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 5000);
+      }
+    }
+
+    const hearts = document.getElementById('hearts');
+    for (let i = 0; i < 20; i++) {
+      const h = document.createElement('span');
+      h.className = 'heart'; h.textContent = ['♥','♡','💗'][i % 3];
+      h.style.left = Math.random()*100 + '%';
+      h.style.fontSize = (14 + Math.random()*25) + 'px';
+      h.style.animationDuration = (7 + Math.random()*9) + 's';
+      h.style.animationDelay = (-Math.random()*14) + 's';
+      hearts.appendChild(h);
+    }
+  </script>
+</body>
+</html>
